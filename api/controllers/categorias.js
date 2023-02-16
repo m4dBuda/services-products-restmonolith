@@ -1,10 +1,12 @@
 const { Op } = require('sequelize');
-const Categorias = require('../models/Categorias');
+const Categorias = require('../models/categorias');
 const dbHelpers = require('../helpers/db_helpers');
-const validator = require('validator');
+const Joi = require('joi');
 
 function getFiltro(query) {
-  const filtro = {};
+  const filtro = {
+    where: {},
+  };
 
   if (query.nome) {
     filtro.where['nome'] = {
@@ -17,22 +19,28 @@ function getFiltro(query) {
   }
 
   if (query.recem_criado) {
-    filtro.order = [['criado_por', 'DESC']];
+    filtro.order = [['criado_em', 'DESC']];
   }
 
   return filtro;
 }
+
+const validateCategoria = (body) => {
+  const schema = Joi.object({
+    nome: Joi.string().min(4).max(40).required(),
+  });
+
+  return schema.validate(body);
+};
 
 module.exports = {
   getAll: async (req, res) => {
     try {
       const { query } = req;
 
-      const categorias = await Categorias().findAll(getFiltro(query));
+      const categorias = await Categorias.findAll(getFiltro(query));
 
-      return res
-        .status(200)
-        .send(categorias || { message: `Categoria de produto não encontrada!` });
+      return res.status(200).send(categorias || { message: `Categoria não encontrada!` });
     } catch (error) {
       return res.status(500).send({ error });
     }
@@ -42,13 +50,9 @@ module.exports = {
     try {
       const { params } = req;
 
-      const categoria = await Categorias().findOne({
-        where: {
-          id: params.id,
-        },
-      });
+      const categoria = await Categorias.findByPk(params.id);
 
-      return res.status(200).send(categoria || { message: `Categoria de produto não encontrada!` });
+      return res.status(200).send(categoria || { message: `Categoria não encontrada!` });
     } catch (error) {
       return res.status(500).send(error);
     }
@@ -58,19 +62,20 @@ module.exports = {
     try {
       const { body } = req;
 
-      if (!validator.isLength(body.nome, { min: 4, max: 40 })) {
-        return res
-          .status(400)
-          .send({ message: 'O nome da categoria deve conter no mínimo 4 caracteres!' });
+      const { error, value } = validateCategoria(body);
+
+      if (error) {
+        return res.status(400).json({ error: error.details[0].message });
       }
 
-      const categoria = await Categorias().create({
-        nome: body.nome,
+      const categoria = await Categorias.create({
+        nome: value.nome,
+        criado_em: new Date(),
       });
 
       return res
         .status(200)
-        .send({ message: `Nova categoria de produto registrada com sucesso!`, id: categoria.id });
+        .send({ message: `Categoria registrada com sucesso!`, id: categoria.id });
     } catch (error) {
       return res.status(500).send(error);
     }
@@ -80,21 +85,23 @@ module.exports = {
     try {
       const { params, body } = req;
 
-      const categorias = await Categorias().findOne({
-        where: {
-          id: params.id,
-        },
-      });
+      const { error, value } = validateCategoria(body);
 
-      if (!categorias) {
+      if (error) {
+        return res.status(400).json({ error: error.details[0].message });
+      }
+
+      const categoria = await Categorias.findByPk(params.id);
+
+      if (!categoria) {
         return res.status(400).send({
-          error: 'A categoria que você está tentando atualizar não existe',
+          error: 'Categoria não encontrada',
         });
       }
 
-      await Categorias().update(
+      await Categorias.update(
         {
-          nome: body.nome,
+          nome: value.nome,
           alterado_em: new Date(),
         },
         {
@@ -110,23 +117,19 @@ module.exports = {
 
   delete: async (req, res) => {
     try {
-      const { params, body } = req;
+      const { params } = req;
 
-      const categorias = await Categorias().findOne({
-        where: { id: params.id },
-      });
+      const categoria = await Categorias.findByPk(params.id);
 
-      if (!categorias) {
-        return res.status(400).send({ error: 'Categoria de produto não encontrada!' });
+      if (!categoria) {
+        return res.status(404).send({ error: 'Categoria não encontrada!' });
       }
 
-      if (categorias) {
-        var novoEstadocategorias = dbHelpers.updateEstado(categorias);
-      }
+      const novoEstadoCategorias = dbHelpers.updateEstado(categoria);
 
-      await Categorias().update(
+      await Categorias.update(
         {
-          ativo: novoEstadocategorias.estado,
+          ativo: novoEstadoCategorias.estado,
           alterado_em: new Date(),
         },
         {
@@ -137,7 +140,7 @@ module.exports = {
       );
 
       return res.status(200).send({
-        message: `categorias ${categorias.nome} ${novoEstadocategorias.novoEstado} com sucesso`,
+        message: `Categoria ${categoria.nome} ${novoEstadoCategorias.novoEstado} com sucesso`,
       });
     } catch (error) {
       return res.status(500).send(error);

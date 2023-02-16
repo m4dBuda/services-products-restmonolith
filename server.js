@@ -16,11 +16,10 @@ server.use('/calculo_parcelas', calculoParcelasRoutes);
 server.use('/produtos', produtosRoutes);
 server.use('/categorias', categoriasRoutes);
 
-server.use((res, next) => {
+server.use((res) => {
   const error = Error('Rota não encontrada.');
   error.status = 404;
   return res.status(error.status).send({ error: error.message });
-  next(error);
 });
 
 server.use((error, res) => {
