@@ -1,4 +1,5 @@
 const { Model, DataTypes } = require('sequelize');
+const Categorias = require('../models/categorias');
 const constants = require('../helpers/constants');
 const helpers = require('../helpers/helpers');
 
@@ -21,9 +22,9 @@ Produtos.init(
     ativo: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      default: true,
+      defaultValue: true,
     },
-    idCategoria: {
+    id_categoria: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
@@ -46,5 +47,7 @@ Produtos.init(
     updatedAt: 'alterado_em',
   },
 );
+
+Produtos.belongsTo(Categorias, { foreignKey: 'id_categoria' });
 
 module.exports = Produtos;
