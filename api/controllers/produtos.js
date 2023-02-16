@@ -1,36 +1,42 @@
 const { Op } = require('sequelize');
 const Produtos = require('../models/produtos');
+const Categorias = require('../models/categorias');
 const dbHelpers = require('../helpers/db_helpers');
-const validator = require('validator');
+const constants = require('../helpers/constants');
 
 function getFiltro(query) {
   const filtro = {};
 
   if (query.nome) {
-    filtro.where['nome'] = {
+    filtro['nome'] = {
       [Op.like]: `%${query.nome}%`,
     };
   }
 
   if (query.descricao) {
-    filtro.where['descricao'] = query.descricao;
+    filtro['descricao'] = {
+      [Op.like]: `%${query.descricao}%`,
+    };
   }
 
   if (query.valor) {
-    filtro.where['valor'] = query.valor;
+    filtro['valor'] = query.valor;
   }
 
   if (query.ativo) {
-    filtro.where['ativo'] = query.ativo;
+    filtro['ativo'] = query.ativo;
   }
 
-  if (query.idCategoria) {
-    filtro.where['idCategoria'] = {
-      [Op.eq]: query.idCategoria,
-    };
+  if (query.id_categoria) {
+    filtro['id_categoria'] = query.id_categoria;
   }
+
   if (query.recem_criado) {
-    filtro.order = [['criado_por', 'DESC']];
+    filtro.order = [['criado_em', 'DESC']];
+  }
+
+  if (query.mais_antigos) {
+    filtro.order = [['criado_em', 'ASC']];
   }
 
   return filtro;
@@ -41,7 +47,15 @@ module.exports = {
     try {
       const { query } = req;
 
-      const produtos = await Produtos().findAll(getFiltro(query));
+      const produtos = await Produtos.findAll({
+        where: getFiltro(query),
+        include: [
+          {
+            model: Categorias,
+            required: true,
+          },
+        ],
+      });
 
       return res.status(200).send(produtos || { message: `Produto não encontrado!` });
     } catch (error) {
@@ -53,10 +67,13 @@ module.exports = {
     try {
       const { params } = req;
 
-      const produto = await Produtos().findOne({
-        where: {
-          id: params.id,
-        },
+      const produto = await Produtos.findByPk(params.id, {
+        include: [
+          {
+            model: Categorias,
+            required: true,
+          },
+        ],
       });
 
       return res.status(200).send(produto || { message: `Produto não encontrado!` });
@@ -69,21 +86,17 @@ module.exports = {
     try {
       const { body } = req;
 
-      if (!validator.isLength(body.nome, { min: 8, max: 40 })) {
-        return res.status(400).send({ message: 'O nome do produto é inválido' });
+      const { error, value } = dbHelpers.validarBody(body, constants.PRODUTOS);
+
+      if (error) {
+        return res.status(400).json({ error: error.details[0].message });
       }
 
-      if (!validator.isLength(body.descricao, { min: 10, max: 255 })) {
-        return res
-          .status(400)
-          .send({ message: 'É necessário informar uma descrição para o produto criado' });
-      }
-
-      const produto = await Produtos().create({
-        nome: body.nome,
-        descricao: body.descricao,
-        valor: body.valor,
-        idCategoria: body.idCategoria,
+      const produto = await Produtos.create({
+        nome: value.nome,
+        descricao: value.descricao,
+        valor: value.valor,
+        id_categoria: value.id_categoria,
       });
 
       return res.status(200).send({ message: `Produto registrado com sucesso!`, id: produto.id });
@@ -96,22 +109,24 @@ module.exports = {
     try {
       const { params, body } = req;
 
-      const produto = await Produtos().findOne({
-        where: {
-          id: params.id,
-        },
-      });
+      const { error, value } = dbHelpers.validarBody(body, constants.PRODUTOS);
+
+      if (error) {
+        return res.status(400).json({ error: error.details[0].message });
+      }
+
+      const produto = await Produtos.findByPk(params.id);
 
       if (!produto) {
         return res.status(400).send({ error: 'Produto não encontrado' });
       }
 
-      await Produtos().update(
+      await Produtos.update(
         {
-          nome: body.nome,
-          descricao: body.descricao,
-          valor: body.valor,
-          idCategoria: body.idCategoria,
+          nome: value.nome,
+          descricao: value.descricao,
+          valor: value.valor,
+          id_categoria: value.id_categoria,
           alterado_em: new Date(),
         },
         {
@@ -119,7 +134,7 @@ module.exports = {
         },
       );
 
-      res.status(200).send({ message: `Produto editado com sucesso!` });
+      res.status(200).send({ message: `Produto atualizado com sucesso!` });
     } catch (error) {
       return res.status(500).send(error);
     }
@@ -127,25 +142,20 @@ module.exports = {
 
   delete: async (req, res) => {
     try {
-      const { params, body } = req;
+      const { params } = req;
 
-      const produto = await Produtos().findOne({
-        where: { id: params.id },
-      });
+      const produto = await Produtos.findByPk(params.id);
 
       if (!produto) {
         return res.status(400).send({ error: 'Produto não encontrado' });
       }
 
-      if (produto) {
-        var novoEstadoProduto = dbHelpers.updateEstado(produto);
-      }
+      const novoEstadoProduto = dbHelpers.updateEstado(produto);
 
-      await Produtos().update(
+      await Produtos.update(
         {
           ativo: novoEstadoProduto.estado,
           alterado_em: new Date(),
-          id_usuario: body.id_usuario,
         },
         {
           where: {

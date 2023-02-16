@@ -1,7 +1,7 @@
 const { Op } = require('sequelize');
 const Categorias = require('../models/categorias');
 const dbHelpers = require('../helpers/db_helpers');
-const Joi = require('joi');
+const constants = require('../helpers/constants');
 
 function getFiltro(query) {
   const filtro = {
@@ -22,16 +22,11 @@ function getFiltro(query) {
     filtro.order = [['criado_em', 'DESC']];
   }
 
+  if (query.mais_antigos) {
+    filtro.order = [['criado_em', 'ASC']];
+  }
   return filtro;
 }
-
-const validateCategoria = (body) => {
-  const schema = Joi.object({
-    nome: Joi.string().min(4).max(40).required(),
-  });
-
-  return schema.validate(body);
-};
 
 module.exports = {
   getAll: async (req, res) => {
@@ -62,7 +57,7 @@ module.exports = {
     try {
       const { body } = req;
 
-      const { error, value } = validateCategoria(body);
+      const { error, value } = dbHelpers.validarBody(body, constants.CATEGORIAS);
 
       if (error) {
         return res.status(400).json({ error: error.details[0].message });
@@ -85,7 +80,7 @@ module.exports = {
     try {
       const { params, body } = req;
 
-      const { error, value } = validateCategoria(body);
+      const { error, value } = dbHelpers.validarBody(body, constants.CATEGORIAS);
 
       if (error) {
         return res.status(400).json({ error: error.details[0].message });
