@@ -10,20 +10,28 @@ Categorias.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    criado_em: {
-      type: DataTypes.STRING,
+    ativo: {
+      type: DataTypes.BOOLEAN,
       allowNull: false,
-      default: new Date(),
+      defaultValue: true,
+    },
+    criado_em: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
     },
     alterado_em: {
-      type: DataTypes.STRING,
+      type: DataTypes.DATE,
       allowNull: true,
-      default: null,
+      defaultValue: null,
     },
   },
   {
     sequelize: helpers.getSequelize(),
     modelName: constants.CATEGORIAS,
+    timestamps: true,
+    createdAt: 'criado_em',
+    updatedAt: 'alterado_em',
   },
 );
 

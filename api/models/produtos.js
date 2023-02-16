@@ -28,19 +28,22 @@ Produtos.init(
       allowNull: false,
     },
     criado_em: {
-      type: DataTypes.STRING,
+      type: DataTypes.DATE,
       allowNull: false,
-      default: new Date(),
+      defaultValue: DataTypes.NOW,
     },
     alterado_em: {
-      type: DataTypes.STRING,
+      type: DataTypes.DATE,
       allowNull: true,
-      default: null,
+      defaultValue: null,
     },
   },
   {
     sequelize: helpers.getSequelize(),
     modelName: constants.PRODUTOS,
+    timestamps: true,
+    createdAt: 'criado_em',
+    updatedAt: 'alterado_em',
   },
 );
 
