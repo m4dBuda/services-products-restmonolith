@@ -1,0 +1,379 @@
+openapi: 3.0.0
+info:
+  title: API para teste de desenvolvedor Back-End - GEN 
+  version: 1.0.0
+  description: API para Gerencimanto de Produtos, Categorias e Parcelas.
+  contact: 
+    name: "João Otávio Carvalho" 
+    url: "https://www.linkedin.com/in/jo%C3%A3o-ot%C3%A1vio-carvalho-164023151/"
+    email: "joaootavioc.21@gmail.com"
+
+
+servers:
+  - url: http://localhost:137000
+tags:
+  - name: ""
+    description: ""
+paths:
+  /produtos:
+    get:
+      summary: Lista todos os produtos
+      description: Retorna uma lista de todos os produtos cadastrados na base de dados.
+      operationId: getAllProdutos
+      tags:
+        - ""
+      parameters:
+        - in: query
+          name: nome
+          schema:
+            type: string
+          description: Filtro para busca pelo nome do produto.
+        - in: query
+          name: descricao
+          schema:
+            type: string
+          description: Filtro para busca pela descrição do produto.
+        - in: query
+          name: valor
+          schema:
+            type: number
+          description: Filtro para busca pelo valor do produto.
+        - in: query
+          name: ativo
+          schema:
+            type: boolean
+          description: Filtro para busca por produtos ativos ou inativos.
+        - in: query
+          name: id_categoria
+          schema:
+            type: integer
+          description: Filtro para busca por produtos de uma categoria específica.
+        - in: query
+          name: recem_criados
+          schema:
+            type: boolean
+          description: Filtro para buscar os produtos mais recentemente criados.
+        - in: query
+          name: mais_antigos
+          schema:
+            type: boolean
+          description: Filtro para buscar os produtos mais antigos.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProdutoComCategoria'
+
+    post:
+      summary: Cria um novo produto
+      description: Criar novo produto.
+      operationId: createProduto
+      tags:
+        - ""
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProdutoInput'
+      responses:
+        "201":
+          description: Produto criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseObject'
+
+  /produtos/{id}:
+    get:
+      summary: Retorna um produto pelo ID
+      description: Retornar um produto pelo ID.
+      operationId: getByIdproduto
+      tags:
+        - ""
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID do produto a ser retornado
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/ProdutoComCategoria'
+
+    put:
+      summary: Atualiza um produto existente
+      description: Atualizar um produto existente.
+      operationId: updateProduto
+      tags:
+        - ""
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID do produto a ser atualizado
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProdutoInput'
+      responses:
+       "200":
+          description: Produto atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseObject'
+    delete:
+      summary: Inativa/Ativa um produto existente
+      description: Inativar/Ativar um produto existente.
+      operationId: deleteProduto
+      tags:
+        - ""
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID do produto a ser Inativado/Ativado
+          schema:
+            type: string
+      responses:
+       "200":
+          description: Produto atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseObject'
+
+  /categorias:
+    get:
+      summary: Lista todas as categorias
+      description: Retorna uma lista de todas as categorias cadastradas na base de dados.
+      operationId: getAllCategorias
+      tags:
+        - ""
+      parameters:
+        - in: query
+          name: nome
+          schema:
+            type: string
+          description: Filtro para busca pelo nome da categoria.
+        - in: query
+          name: ativo
+          schema:
+            type: boolean
+          description: Filtro para busca por categorias ativas ou inativas.
+        - in: query
+          name: recem_criados
+          schema:
+            type: boolean
+          description: Filtro para buscar as categorias mais recentemente criadas.
+        - in: query
+          name: mais_antigos
+          schema:
+            type: boolean
+          description: Filtro para buscar as categorias mais antigas.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Categoria'
+
+    post:
+      summary: Cria uma nova categoria
+      description: Criar nova categoria.
+      operationId: createCategoria
+      tags:
+        - ""
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Categoria'
+      responses:
+        "201":
+          description: Categoria criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseObject'
+
+  /categorias/{id}:
+    get:
+      summary: Retorna uma Categoria pelo ID
+      description: Retorna uma categoria pelo ID.
+      operationId: getByIdCategoria
+      tags:
+        - ""
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID da Categoria a ser retornada
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Categoria'
+
+    put:
+      summary: Atualiza uma categoria existente
+      description: Atualizar uma categoria existente.
+      operationId: updateCategoria
+      tags:
+        - ""
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID da categoria a ser atualizada
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Categoria'
+      responses:
+        "200":
+          description: Categoria atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseObject'
+    delete:
+      summary: Inativa/Ativa uma Categoria existente
+      description: Inativar/Ativar uma Categoria existente.
+      operationId: deleteCategoria
+      tags:
+        - ""
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID da categoria a ser Inativada/Ativada
+          schema:
+            type: string
+      responses:
+       "200":
+          description: Produto atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseObject'
+
+  /calculo_parcelas:
+    post:
+      summary: Retorna valor das parcelas para um produto e valor final.
+      description: Retorna o resultado do calculo das parcelas de cada produto de acordo com sua categoria e quantidade de parcelas.
+      operationId: postCalculoParcelas
+      tags:
+        - ""
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalculoParcelas'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/ResponseObject'
+
+components:
+  schemas:
+    ProdutoInput:
+      type: object
+      properties:
+        nome:
+          type: string
+        descricao:
+          type: string
+        valor:
+          type: number
+        id_categoria:
+          type: integer
+      required:
+        - nome
+        - descricao
+        - valor
+        - id_categoria
+
+    ProdutoComCategoria:
+      type: object
+      properties:
+        id:
+          type: string
+        nome:
+          type: string
+        descricao:
+          type: string
+        valor:
+          type: number
+        ativo:
+          type: boolean
+        id_categoria:
+          type: integer
+        criado_em:
+          type: string
+          format: date-time
+        alterado_em:
+          type: string
+          format: date-time
+        categoria:
+          $ref: '#/components/schemas/Categoria'
+
+    Categoria:
+      type: object
+      properties:
+        id:
+          type: integer
+        nome:
+          type: string
+        ativo:
+          type: boolean
+        criado_em:
+          type: string
+          format: date-time
+        alterado_em:
+          type: string
+          format: date-time
+    
+    CalculoParcelas:
+      type: object
+      properties:
+        id_produto:
+          type: integer
+        qnt_parcelas:
+          type: integer
+      
+    ResponseObject:
+      type: object
+      properties:
+        message:
+          type: string
