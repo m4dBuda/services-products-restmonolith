@@ -57,7 +57,11 @@ module.exports = {
         ],
       });
 
-      return res.status(200).send(produtos || { message: `Produto não encontrado!` });
+      if (produtos.length === 0) {
+        return res.status(404).send({ message: `Produto não encontrado!` });
+      }
+
+      return res.status(200).send(produtos);
     } catch (error) {
       return res.status(500).send({ error });
     }
@@ -76,7 +80,11 @@ module.exports = {
         ],
       });
 
-      return res.status(200).send(produto || { message: `Produto não encontrado!` });
+      if (!produto) {
+        return res.status(404).send({ message: `Produto não encontrado!` });
+      }
+
+      return res.status(200).send(produto);
     } catch (error) {
       return res.status(500).send(error);
     }
@@ -99,7 +107,7 @@ module.exports = {
         id_categoria: value.id_categoria,
       });
 
-      return res.status(200).send({ message: `Produto registrado com sucesso!`, id: produto.id });
+      return res.status(201).send({ message: `Produto registrado com sucesso!`, id: produto.id });
     } catch (error) {
       return res.status(500).send(error);
     }
@@ -118,7 +126,7 @@ module.exports = {
       const produto = await Produtos.findByPk(params.id);
 
       if (!produto) {
-        return res.status(400).send({ error: 'Produto não encontrado' });
+        return res.status(404).send({ error: 'Produto não encontrado!' });
       }
 
       await Produtos.update(
@@ -147,7 +155,7 @@ module.exports = {
       const produto = await Produtos.findByPk(params.id);
 
       if (!produto) {
-        return res.status(400).send({ error: 'Produto não encontrado' });
+        return res.status(404).send({ error: 'Produto não encontrado!' });
       }
 
       const novoEstadoProduto = dbHelpers.updateEstado(produto);
@@ -165,7 +173,7 @@ module.exports = {
       );
 
       return res.status(200).send({
-        message: `Produto ${produto.nome} ${novoEstadoProduto.novoEstado} com sucesso`,
+        message: `Produto ${novoEstadoProduto.novoEstado} com sucesso!`,
       });
     } catch (error) {
       return res.status(500).send(error);

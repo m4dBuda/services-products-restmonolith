@@ -35,7 +35,11 @@ module.exports = {
 
       const categorias = await Categorias.findAll(getFiltro(query));
 
-      return res.status(200).send(categorias || { message: `Categoria não encontrada!` });
+      if (categorias.length === 0) {
+        return res.status(404).send({ message: `Categoria não encontrada!` });
+      }
+
+      return res.status(200).send(categorias);
     } catch (error) {
       return res.status(500).send({ error });
     }
@@ -47,7 +51,11 @@ module.exports = {
 
       const categoria = await Categorias.findByPk(params.id);
 
-      return res.status(200).send(categoria || { message: `Categoria não encontrada!` });
+      if (!categoria) {
+        return res.status(404).send({ message: `Categoria não encontrada!` });
+      }
+
+      return res.status(200).send(categoria);
     } catch (error) {
       return res.status(500).send(error);
     }
@@ -69,7 +77,7 @@ module.exports = {
       });
 
       return res
-        .status(200)
+        .status(201)
         .send({ message: `Categoria registrada com sucesso!`, id: categoria.id });
     } catch (error) {
       return res.status(500).send(error);
@@ -89,7 +97,7 @@ module.exports = {
       const categoria = await Categorias.findByPk(params.id);
 
       if (!categoria) {
-        return res.status(400).send({
+        return res.status(404).send({
           error: 'Categoria não encontrada',
         });
       }
@@ -135,7 +143,7 @@ module.exports = {
       );
 
       return res.status(200).send({
-        message: `Categoria ${categoria.nome} ${novoEstadoCategorias.novoEstado} com sucesso`,
+        message: `Categoria ${novoEstadoCategorias.novoEstado} com sucesso!`,
       });
     } catch (error) {
       return res.status(500).send(error);

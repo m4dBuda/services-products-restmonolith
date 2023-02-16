@@ -23,7 +23,7 @@ module.exports = {
         var valorParcela = dbHelpers.calcularValorParcelas(produto, body.qnt_parcelas);
       }
 
-      const valorFinal = valorParcela * body.qnt_parcelas;
+      const valorFinal = parseFloat(valorParcela * body.qnt_parcelas).toFixed(2);
 
       return res.status(200).send({
         message: `Caso dividido em ${body.qnt_parcelas}, o valor de cada parcela será de: ${valorParcela}, e o valor final do produto de ${valorFinal}.`,

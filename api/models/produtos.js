@@ -1,7 +1,7 @@
 const { Model, DataTypes } = require('sequelize');
 const Categorias = require('../models/categorias');
 const constants = require('../helpers/constants');
-const helpers = require('../helpers/helpers');
+const sequelize = require('../helpers/database');
 
 class Produtos extends Model {}
 
@@ -40,7 +40,7 @@ Produtos.init(
     },
   },
   {
-    sequelize: helpers.getSequelize(),
+    sequelize: sequelize,
     modelName: constants.PRODUTOS,
     timestamps: true,
     createdAt: 'criado_em',

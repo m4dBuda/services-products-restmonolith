@@ -1,6 +1,6 @@
 const { Model, DataTypes } = require('sequelize');
 const constants = require('../helpers/constants');
-const helpers = require('../helpers/helpers');
+const sequelize = require('../helpers/database');
 
 class Categorias extends Model {}
 
@@ -27,7 +27,7 @@ Categorias.init(
     },
   },
   {
-    sequelize: helpers.getSequelize(),
+    sequelize: sequelize,
     modelName: constants.CATEGORIAS,
     timestamps: true,
     createdAt: 'criado_em',
