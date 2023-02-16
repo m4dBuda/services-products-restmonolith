@@ -1,0 +1,21 @@
+{
+  "name": "api-teste-gen",
+  "version": "1.0.0",
+  "description": "API para gerenciamento de produtos e categorias.",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --runInBand",
+    "start": "nodemon server.js"
+  },
+  "author": "João Otávio C. de Carvalho",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "http": "^0.0.1-security",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.20",
+    "pg": "^8.9.0",
+    "sequelize": "^6.28.0",
+    "validator": "^13.9.0"
+  }
+}
