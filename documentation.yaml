@@ -12,16 +12,17 @@ info:
 servers:
   - url: http://localhost:137000
 tags:
-  - name: ""
-    description: ""
+  - name: Produtos
+  - name: Categorias
+  - name: Calculos Parcelas
 paths:
   /produtos:
     get:
       summary: Lista todos os produtos
       description: Retorna uma lista de todos os produtos cadastrados na base de dados.
       operationId: getAllProdutos
-      tags:
-        - ""
+      tags: ['Produtos']
+      
       parameters:
         - in: query
           name: nome
@@ -72,8 +73,7 @@ paths:
       summary: Cria um novo produto
       description: Criar novo produto.
       operationId: createProduto
-      tags:
-        - ""
+      tags: ['Produtos']
       requestBody:
         required: true
         content:
@@ -93,8 +93,7 @@ paths:
       summary: Retorna um produto pelo ID
       description: Retornar um produto pelo ID.
       operationId: getByIdproduto
-      tags:
-        - ""
+      tags: ['Produtos']
       parameters:
         - in: path
           name: id
@@ -114,8 +113,7 @@ paths:
       summary: Atualiza um produto existente
       description: Atualizar um produto existente.
       operationId: updateProduto
-      tags:
-        - ""
+      tags: ['Produtos']
       parameters:
         - in: path
           name: id
@@ -140,8 +138,7 @@ paths:
       summary: Inativa/Ativa um produto existente
       description: Inativar/Ativar um produto existente.
       operationId: deleteProduto
-      tags:
-        - ""
+      tags: ['Produtos']
       parameters:
         - in: path
           name: id
@@ -162,8 +159,7 @@ paths:
       summary: Lista todas as categorias
       description: Retorna uma lista de todas as categorias cadastradas na base de dados.
       operationId: getAllCategorias
-      tags:
-        - ""
+      tags: ['Categorias']
       parameters:
         - in: query
           name: nome
@@ -199,8 +195,7 @@ paths:
       summary: Cria uma nova categoria
       description: Criar nova categoria.
       operationId: createCategoria
-      tags:
-        - ""
+      tags: ['Categorias']
       requestBody:
         required: true
         content:
@@ -220,8 +215,7 @@ paths:
       summary: Retorna uma Categoria pelo ID
       description: Retorna uma categoria pelo ID.
       operationId: getByIdCategoria
-      tags:
-        - ""
+      tags: ['Categorias']
       parameters:
         - in: path
           name: id
@@ -241,8 +235,7 @@ paths:
       summary: Atualiza uma categoria existente
       description: Atualizar uma categoria existente.
       operationId: updateCategoria
-      tags:
-        - ""
+      tags: ['Categorias']
       parameters:
         - in: path
           name: id
@@ -267,8 +260,7 @@ paths:
       summary: Inativa/Ativa uma Categoria existente
       description: Inativar/Ativar uma Categoria existente.
       operationId: deleteCategoria
-      tags:
-        - ""
+      tags: ['Categorias']
       parameters:
         - in: path
           name: id
@@ -289,8 +281,7 @@ paths:
       summary: Retorna valor das parcelas para um produto e valor final.
       description: Retorna o resultado do calculo das parcelas de cada produto de acordo com sua categoria e quantidade de parcelas.
       operationId: postCalculoParcelas
-      tags:
-        - ""
+      tags: ['Calculos Parcelas']
       requestBody:
         required: true
         content:
