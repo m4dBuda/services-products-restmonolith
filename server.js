@@ -9,7 +9,8 @@ const server = express();
 server.use(express.json());
 server.use(morgan('dev'));
 const httpServer = http.createServer(server);
-if (!process.env.NODE_ENV === 'test') {
+
+if (process.env.NODE_ENV !== 'test') {
   httpServer.listen(13700);
 }
 
